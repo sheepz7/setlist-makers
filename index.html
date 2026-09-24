@@ -21,159 +21,63 @@ input{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 13
 .note{font-size:11px;color:#888;line-height:1.7}.empty{color:#999;font-size:12px;padding:8px 0}
 @media(max-width:520px){.hero h1{font-size:31px}.card{padding:18px}.setlist{padding:18px 15px}}
 </style>
-</head>
+<style>
+.result{display:none}.resulthead{text-align:center;padding:12px 0 20px}.resulthead h2{font-size:25px;margin:6px}.setlist{background:#111;color:#fff;border-radius:20px;padding:20px}.setlist h3{font-size:12px;letter-spacing:.18em;color:#aaa;margin:0 0 10px}.setlist h3 span{float:right}.setrow{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #333}.setrow .num{color:#999;font-size:11px}.setrow .title{font-size:14px}.edit{display:flex;gap:4px}.edit button{border:0;border-radius:7px;padding:5px 7px;font-size:11px;cursor:pointer}.edit button:disabled{opacity:.3}.encore{margin-top:20px;border-top:1px solid #444;padding-top:18px}.add{width:100%;margin-top:12px}.modal{position:fixed;inset:0;background:#0007;display:none;align-items:center;justify-content:center;padding:16px;z-index:20}.modal.open{display:flex}.modalbox{background:#fff;border-radius:18px;padding:18px;width:min(620px,100%);max-height:85vh;display:flex;flex-direction:column}.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.modalbox>input{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin-bottom:10px}.modalbox small{color:#888;margin-top:8px}.songopt{display:block;width:100%;text-align:left;margin:5px 0;padding:10px;border:1px solid #ddd;border-radius:9px;background:#f7f7f8;cursor:pointer}.songopt:disabled{opacity:.4}.empty{color:#999;padding:12px;text-align:center}
+@media(max-width:560px){.setrow{grid-template-columns:28px 1fr}.edit{grid-column:2;justify-content:flex-start}}
+</style></head>
 <body>
 <div class="wrap">
-  <header class="hero">
-    <div class="kicker">FAN-MADE · SETLIST GENERATOR</div>
-    <h1>SETLIST MAKER</h1>
-    <p>あなたの理想のライブセトリを、つくろう。</p>
-  </header>
+<header class="hero">
+  <div class="kicker">FAN-MADE · SETLIST GENERATOR</div>
+  <h1>SETLIST MAKER</h1>
+  <p>Hey! Sɑy! JUMP</p>
+</header>
 
-  <section class="card">
-    <h2>01　公演を設定</h2>
-    <div class="label">アーティスト</div>
-    <input id="artist" value="Hey! Sɑy! JUMP" placeholder="アーティスト名">
-    <div class="label">曲数</div>
-    <div class="row" id="countChoices">
-      <button class="choice" data-count="15">15曲</button>
-      <button class="choice active" data-count="20">20曲</button>
-      <button class="choice" data-count="25">25曲</button>
-      <button class="choice" data-count="30">30曲</button>
-    </div>
-    <div class="label">セトリの雰囲気</div>
-    <div class="row" id="moodChoices">
-      <button class="choice active" data-mood="balanced">王道</button>
-      <button class="choice" data-mood="up">盛り上がり</button>
-      <button class="choice" data-mood="emo">エモ</button>
-      <button class="choice" data-mood="dance">ダンス</button>
-      <button class="choice" data-mood="random">完全ランダム</button>
-    </div>
-  </section>
-
-  <section class="card">
-    <h2>02　曲を登録</h2>
-    <div class="addrow">
-      <input id="songInput" placeholder="曲名を入力して追加">
-      <button class="btn" id="addBtn">追加</button>
-    </div>
-    <div class="songlist" id="songList"></div>
-    <p class="note">曲名をタップすると削除できます。最初からサンプル曲が入っています。好きなアーティストの曲に入れ替えて遊べます。</p>
-  </section>
-
-  <section class="card">
-    <h2>03　こだわり</h2>
-    <div class="label">絶対入れたい曲</div>
-    <div class="addrow"><input id="mustInput" placeholder="例：ウィークエンダー"><button class="btn secondary" id="mustAdd">追加</button></div>
-    <div class="songlist" id="mustList"></div>
-    <div class="label">入れたくない曲</div>
-    <div class="addrow"><input id="avoidInput" placeholder="例：○○○"><button class="btn secondary" id="avoidAdd">追加</button></div>
-    <div class="songlist" id="avoidList"></div>
-  </section>
-
+<section class="card">
+  <h2>セトリのタイトル</h2>
+  <input id="titleInput" type="text" placeholder="自分だけの理想セトリ">
   <button class="btn generate" id="generate">✨ セトリを作る</button>
+</section>
 
-  <section class="result" id="result">
-    <div class="resulthead">
-      <div class="kicker">YOUR LIVE</div>
-      <h2 id="resultArtist"></h2>
-      <div class="meta" id="resultMeta"></div>
-    </div>
-    <div class="setlist" id="setlist"></div>
-    <div class="actions">
-      <button class="btn" id="again">🔄 もう一度</button>
-      <button class="btn secondary" id="save">📸 画像保存</button>
-    </div>
-  </section>
+<section class="result" id="result">
+  <div class="resulthead"><div class="kicker">YOUR SETLIST</div><h2 id="resultTitle"></h2></div>
+  <div class="setlist">
+    <h3>MAIN SET <span id="mainCount"></span></h3>
+    <div id="mainList"></div>
+    <button class="btn secondary add" onclick="openPicker('main',null)">＋ メインに曲を追加</button>
+    <div class="encore"><h3>ENCORE <span id="encoreCount"></span></h3><div id="encoreList"></div>
+    <button class="btn secondary add" onclick="openPicker('encore',null)">＋ アンコールを追加</button></div>
+  </div>
+  <div class="actions"><button class="btn" onclick="generate()">🔄 再生成</button><button class="btn secondary" onclick="resetAll()">↩️ リセット</button></div>
+</section>
+</div>
+
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()">
+<div class="modalbox">
+  <div class="modalhead"><strong id="modalTitle">曲を選択</strong><button class="btn secondary" onclick="closeModal()">✕</button></div>
+  <input id="search" placeholder="曲名を検索..." oninput="renderPicker()">
+  <div id="options"></div>
+  <small>使用中の曲は選べません（変更中の曲は除く）。</small>
+</div>
 </div>
 
 <script>
-const sample = [
-["ウィークエンダー","up"],["Come On A My House","up"],["Ride With Me","dance"],
-["AinoArika","dance"],["SUPER DELICATE","emo"],["Fantastic Time","dance"],
-["Give Me Love","emo"],["OVER THE TOP","up"],["White Love","emo"],
-["マエヲムケ","up"],["ファンファーレ！","up"],["Last Mermaid…","emo"],
-["I am","dance"],["Muah Muah","up"],["Your Song","emo"],["狼青年","dance"],
-["ネガティブファイター","up"],["群青ランナウェイ","dance"],["Sing-along","up"],
-["春玄鳥","emo"],["DEAR MY LOVER","up"],["それぞれ。","emo"],
-["Ready to Jump","dance"],["ウラオモテ","dance"],["恋をするんだ","emo"],
-["キミアトラクション","up"],["明日へのYELL","up"],["Chau#","up"],
-["切なさ、ひきかえに","emo"],["Your Seed","up"],["Ultra Music Power","up"]
-];
-let songs = [...sample];
-let must = [], avoid = [], count=20, mood="balanced";
-
-function renderSongs(){
-  const el=document.getElementById("songList"); el.innerHTML="";
-  songs.forEach((s,i)=>{const b=document.createElement("span");b.className="song";b.textContent=s[0]+" ×";b.onclick=()=>{songs.splice(i,1);renderSongs()};el.appendChild(b)});
-}
-function renderTags(arr,id){
-  const el=document.getElementById(id);el.innerHTML="";
-  arr.forEach((s,i)=>{const b=document.createElement("span");b.className="song";b.textContent=s+" ×";b.onclick=()=>{arr.splice(i,1);renderTags(arr,id)};el.appendChild(b)});
-}
-renderSongs();
-
-document.querySelectorAll("#countChoices .choice").forEach(b=>b.onclick=()=>{count=+b.dataset.count;document.querySelectorAll("#countChoices .choice").forEach(x=>x.classList.remove("active"));b.classList.add("active")});
-document.querySelectorAll("#moodChoices .choice").forEach(b=>b.onclick=()=>{mood=b.dataset.mood;document.querySelectorAll("#moodChoices .choice").forEach(x=>x.classList.remove("active"));b.classList.add("active")});
-
-function addSong(){
- const v=document.getElementById("songInput").value.trim(); if(!v)return;
- songs.push([v,"up"]);document.getElementById("songInput").value="";renderSongs();
-}
-document.getElementById("addBtn").onclick=addSong;
-document.getElementById("songInput").onkeydown=e=>{if(e.key==="Enter")addSong()};
-
-function addTag(input,arr,id){const el=document.getElementById(input),v=el.value.trim();if(v){arr.push(v);el.value="";renderTags(arr,id)}}
-document.getElementById("mustAdd").onclick=()=>addTag("mustInput",must,"mustList");
-document.getElementById("avoidAdd").onclick=()=>addTag("avoidInput",avoid,"avoidList");
-
+const songs=["Ultra Music Power", "Star Time", "Too Shy", "Dreams come true", "俺たちの青春", "Chance to Change", "Your Seed", "冒険ライダー", "真夜中のシャドーボーイ", "スクール革命", "Deep night 君思う", "瞳のスクリーン", "輝きデイズ", "Romeo & Juliet", "DREAMER", "INFINITY", "真紅", "ガンバレッツゴー！", "情熱JUMP", "すまいるそんぐ", "Memories", "Time", "Score", "アイ☆スクリーム", "Dash!!", "Thank You ～僕たちから君へ～", "「ありがとう」～世界のどこにいても～", "FLY", "スノウソング", "二人掛けの場所", "OVER", "Born in the EARTH", "愛ing-アイシテル", "ユー・ガッタ・モール", "Screw", "Magic Power", "スクールデイズ", "GET!!", "Beat Line", "眠リノ森", "BE ALIVE", "SUPER DELICATE", "ス･リ･ル", "ワンダーランド･トレイン", "JUMP Around The World!!!", "succeed", "パーフェクト ライフ", "つなぐ手と手", "僕はVampire", "Hero", "Hurry up!", "サム＆ピンキー", "Together forever", "スパイシー", "ウタウタウ", "Endless Dream", "スナップ", "花えがお", "シングルメドレー Second act", "Come On A My House", "Just For You", "スクランブル", "BOUNCE", "New Hope ～こんなに僕らはひとつ", "Ride With Me", "Go To The Future", "GIFT", "School Girl", "Hands Up", "Aino Arika", "愛すればもっとハッピーライフ", "桜、咲いたよ", "OUR FUTURE", "Oh！My Jelly！～僕らはOK～", "スギルセツナ", "～Prelude of smart～", "FOREVER", "Ready Go", "切なさ、ひきかえに", "Candle", "パステル", "コンパスローズ", "Come Back…?", "RELOAD", "はじまりのメロディ", "My World", "ともだちだよ", "Yes!", "Super Super Night", "Oh!アイドル!", "ウィークエンダー", "明日へのYELL", "ただ前へ", "スーツデイズ", "Through the night", "レインボーキャンデイーガール", "殺せんせーションズ", "Chau＃", "我I Need You", "スルー", "KAZEKAORU", "JUMPing CAR", "Walk", "SHen SHera SHen", "キラキラ光れ", "愛よ、僕を導いてゆけ", "Fever", "Boys Don't Stop", "Dangerous", "ヨワムシ★シューター", "Farewell", "Very Very Happy", "殺せんせーションズ(Hey! Say! JUMP ver.)", "DISCO JOCKEY!!!", "UNION", "ペットショップラブモーション", "3月14日～時計", "Viva！ 9's SOUL", "Puppy Boo", "キミアトラクション", "ChikuTaku", "秋、晴れ。僕に風が吹いた。", "ShaIl We?", "NEW AGE", "Ignition", "さよならセンセーション", "真剣SUNSHINE", "パーリーモンスター", "Speed It Up", "We are 男の子！", "Eve", "Masquerade", "RUN de Boo！", "ドリームマスター", "B.A.B.Y.", "Special Love", "Dear.", "Eternal", "SUPERMAN", "order", "Tasty U", "スローモーション", "愛のシュビドゥバ", "KISS Diary", "Brand New World", "From.", "今夜貴方を口説きます", "Mr.Flawless", "僕とけいと", "My Girl", "Fantastic Time", "Never Let You Go", "静寂の朝、君といる世界。", "ワンダーロード", "What A Feeling", "Give Me Love", "Traffic Jam", "TOY", "Baby I Love You", "Glorious", "明日ハレルヤ", "OVER THE TOP", "Vanilla Ice", "Funky Time", "PARTY!!", "Our days", "Precious Girl", "Are You There?", "灼熱の夢", "Smile in Summer", "Sweet Liar", "スタートデイズ", "I/O", "H.our Time", "TO THE TOP", "トビラの向こう", "心・技・体", "Viva! 9's SOUL(2017 Ver.)", "太陽にLOVE MOTION!", "White Love", "星の降る夜に", "Rock U Baby!", "Good Life", "Spark×2", "Usual Soldeir", "マエヲムケ", "Love Hurricane", "BE MY VALENTINE!", "チョコラタ", "NEW LIFE", "Diggy Down", "Snow Memories", "COSMIC☆HUMAN", "Go My Way", "やんちゃなヒーロー", "SWEET or HOT ?", "ルーレット", "Draw My Life !", "BANGER NIGHT", "Dance The Nght Away", "女王蜂", "One & One Makes Two", "TO THE GALAXY", "またこの場所で", "Jealous guy", "最後のラブソング", "FLASH", "swinging days", "City Wander", "We Believe", "OLÈ!", "Journey", "Virtual Butterfly", "スンダDance", "YOU & I", "Do it again", "159", "Waiting for the rain", "条件反射", "Bubble Gum", "題名の無い物語", "PINK", "流星の詩", "Lucky-Unlucky", "Oh! my darling", "Last Dance", "真夜中のシャドーボーイ～SENSE or LOVE Remix", "Entertainment", "バンビーノ", "愛だけがすべて-What do you want?-", "Bloom", "ファンファーレ！", "Mystery O", "トレンディーラブ #REIWA", "Napa Napa", "Go Fighter", "波の上で会いましょう", "Summer Romantic", "ファンファーレ！DE 盆踊り", "ミラクルワンダーマジック", "獣と薔薇", "はな壱もんめ", "UTAGE Tonight", "「I」", "Zombie Step", "Love Equation", "アイノユウヒ", "CALL&PRAY", "パレードが始まる", "ぷぅのうた", "パレードは終わらない -Life is an Adventure-", "I am", "Muah Muah", "クランメリア", "ときめきは嘘じゃない", "Last Mermaid...", "Love me PLZ", "Stupid", "U", "言葉はいらない", "Your Song", "あなた想い", "Secret Magic", "hearts color", "BOW WOW SONG", "ヒカリサス", "Fab-ism", "狼青年", "千夜一夜", "Jazzy Cut", "Snow White", "Liar", "MANTRA", "Puppet", "Kiss Your Lips", "御伽と知る世界", "ナイモノネダリ", "Last forever", "闇の先へ僕らは歩き出す", "ネガティブファイター", "Try & error", "#502", "Letter", "僕らの意味を", "群青ランナウェイ", "Lovely Dance", "シャッターチャンス", "ドラマチック", "Love Your Life", "Sing-along", "Break The Wall", "モノローグ", "ハローメロディ", "ASAP!", "a r e a", "恋をするんだ", "春玄鳥", "ウィークエンダー（Torikae Mix）", "TO THE TOP（Torikae Mix）", "僕はVampire（Torikae Mix）", "Happy！Birthdaaaaaaaay", "MASTERPIECE", "サンダーソニア", "業務☆スーパーマン", "Fate or Destiny", "OH MY BUDDY", "漢花火", "ビターチョコレート", "君がみた一等星", "Change the world Y2K", "人力飛行機", "Get Out Of My House", "DEAR MY LOVER", "ウラオモテ", "Sweet Chilli Sauce", "あの日の僕へ", "エーデルワイス", "VILLAIN", "Ready to Jump", "だいすきなきみへ", "それぞれ。", "Dirty Innocence", "ときめくあなた", "そっと鏡にキスをした", "Tiki Don", "まだ切らない", "あの日の夢を見させてよ", "キミノミカタ", "PULL UP", "Evans Knot", "please, 'Q'uickly!", "UMP", "NERD", "BAD NEWS 見たくない！", "執事的なボーイフレンド", "ハイライト", "ナユタの海", "ルーティーン", "She's Amazing", "Donkey Gongs", "シアティカ", "Never end...", "DARK HERO", "また、あした", "eek!!", "最後の涙", "リズム", "Cheer!", "encore", "SUPER CRUISIN'", "Step by step", "未来線", "ラブレター", "MATSURI☆FEVER", "GHOST", "Symphony", "RUN THIS WORLD", "Scale It Up", "cowboy", "君だけの1ページ", "Serenity", "メロリ", "劇的LOVE", "ハニカミ", "traveler", "赤裸々", "ハートビート", "NEED YOU", "CUE CUE CUTE"];
+let main=[],encore=[],target=null;
+const $=id=>document.getElementById(id);
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function generate(){
- let pool=songs.filter(s=>!avoid.includes(s[0]));
- if(pool.length<count){alert("曲数より登録曲が少ないよ！曲を追加してね。");return}
- let forced=must.map(n=>pool.find(s=>s[0]===n)).filter(Boolean);
- forced=[...new Map(forced.map(x=>[x[0],x])).values()].slice(0,count);
- let rest=pool.filter(s=>!forced.some(x=>x[0]===s[0]));
- if(mood==="random") rest=shuffle(rest);
- else {
-   const weight=s=>mood==="up"?(s[1]==="up"?4:s[1]==="dance"?3:1):
-     mood==="dance"?(s[1]==="dance"?4:s[1]==="up"?2:1):
-     mood==="emo"?(s[1]==="emo"?4:s[1]==="up"?2:1):
-     (s[1]==="up"?3:s[1]==="dance"?2:2);
-   rest=shuffle(rest).sort((a,b)=>weight(b)-weight(a)+Math.random()-.5);
- }
- let chosen=[...forced,...rest].slice(0,count);
- chosen=shuffle(chosen);
- // ライブらしい流れ：最初はアップ、終盤はエモ/アップ、アンコールはアップ寄り
- if(mood!=="random"){
-   const first=chosen.findIndex(x=>x[1]==="up"||x[1]==="dance"); if(first>0)[chosen[0],chosen[first]]=[chosen[first],chosen[0]];
- }
- const encoreCount=count>=25?3:2;
- const encore=chosen.splice(chosen.length-encoreCount,encoreCount);
- const artist=document.getElementById("artist").value.trim()||"MY LIVE";
- document.getElementById("resultArtist").textContent=artist;
- document.getElementById("resultMeta").textContent=`${count} SONGS · ${mood==="balanced"?"王道":mood==="up"?"盛り上がり":mood==="emo"?"エモ":mood==="dance"?"ダンス":"ランダム"}`;
- const box=document.getElementById("setlist");box.innerHTML="";
- chosen.forEach((s,i)=>{
-   const d=document.createElement("div");d.className="setrow";
-   d.innerHTML=`<span class="num">${String(i+1).padStart(2,"0")}</span><span class="title">${s[0]}</span>`;
-   box.appendChild(d);
-   if(i===Math.floor(chosen.length*.48)-1){const mc=document.createElement("div");mc.className="mc";mc.textContent="— MC —";box.appendChild(mc)}
- });
- const en=document.createElement("div");en.className="encore";en.innerHTML="<h3>ENCORE</h3>";
- encore.forEach((s,i)=>{const d=document.createElement("div");d.className="setrow";d.innerHTML=`<span class="num">${String(chosen.length+i+1).padStart(2,"0")}</span><span class="title">${s[0]}</span>`;en.appendChild(d)});
- box.appendChild(en);
- document.getElementById("result").style.display="block";document.getElementById("result").scrollIntoView({behavior:"smooth"});
-}
-document.getElementById("generate").onclick=generate;
-document.getElementById("again").onclick=generate;
-document.getElementById("save").onclick=async()=>{
- const node=document.getElementById("setlist");
- const blob=new Blob([`<!doctype html><html><body style="background:#111;color:#fff;font-family:sans-serif;padding:30px">${node.outerHTML}</body></html>`],{type:"text/html"});
- // Portable fallback: save the result as an HTML card if canvas libraries are unavailable.
- const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="my-setlist.html";a.click();URL.revokeObjectURL(a.href);
- alert("セトリカードをHTMLとして保存しました。");
-};
+function generate(){let p=shuffle(songs);main=p.slice(0,30);encore=p.slice(30,34);render()}
+function resetAll(){main=[];encore=[];$('result').style.display='none'}
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function render(){ $('result').style.display='block'; $('resultTitle').textContent=$('titleInput').value.trim()||'自分だけの理想セトリ'; $('mainCount').textContent=main.length+'曲'; $('encoreCount').textContent=encore.length+'曲'; draw('mainList',main,'main'); draw('encoreList',encore,'encore') }
+function draw(id,list,type){let e=$(id);if(!list.length){e.innerHTML='<div class="empty">曲がありません</div>';return}e.innerHTML=list.map((s,i)=>`<div class="setrow"><span class="num">${type==='main'?String(i+1).padStart(2,'0'):'E'+(i+1)}</span><span class="title">${esc(s)}</span><span class="edit"><button onclick="move('${type}',${i},-1)" ${i===0?'disabled':''}>↑</button><button onclick="move('${type}',${i},1)" ${i===list.length-1?'disabled':''}>↓</button><button onclick="openPicker('${type}',${i})">変更</button><button onclick="removeSong('${type}',${i})">削除</button></span></div>`).join('')}
+function move(type,i,d){let a=type==='main'?main:encore,j=i+d;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];render()}
+function removeSong(type,i){(type==='main'?main:encore).splice(i,1);render()}
+function openPicker(type,index){target={type,index};$('modalTitle').textContent=index===null?(type==='main'?'メインに曲を追加':'アンコールに追加'):'曲を変更';$('search').value='';$('modal').classList.add('open');renderPicker();setTimeout(()=>$('search').focus(),0)}
+function closeModal(){$('modal').classList.remove('open');target=null}
+function renderPicker(){if(!target)return;let q=$('search').value.trim().toLowerCase(),used=new Set([...main,...encore]),current=target.index===null?null:(target.type==='main'?main[target.index]:encore[target.index]);let f=songs.filter(s=>!q||s.toLowerCase().includes(q));$('options').innerHTML=f.length?f.map(s=>{let dis=used.has(s)&&s!==current;return `<button class="songopt" ${dis?'disabled':''} onclick="selectSong(${JSON.stringify(s)})">${esc(s)}${dis?'（使用中）':''}</button>`}).join(''):'<div class="empty">該当する曲がありません</div>'}
+function selectSong(song){let a=target.type==='main'?main:encore;if(target.index===null){if(main.includes(song)||encore.includes(song))return;a.push(song)}else{if(new Set([...main,...encore]).has(song)&&a[target.index]!==song)return;a[target.index]=song}closeModal();render()}
+$('generate').onclick=generate;
 </script>
 </body>
 </html>
