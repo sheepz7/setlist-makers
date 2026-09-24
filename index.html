@@ -30,6 +30,8 @@ input{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 13
 .stats{margin-top:14px;background:#f7f6f3;border:1px solid var(--line);border-radius:14px;padding:14px;display:none}.stats h3{font-size:14px;margin:0 0 10px}.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.statitem{background:#fff;border-radius:10px;padding:10px;text-align:center}.statitem strong{display:block;font-size:18px}.statitem span{font-size:10px;color:#777}.countlist{margin-top:12px;max-height:260px;overflow:auto}.countrow{display:flex;justify-content:space-between;border-bottom:1px solid #e8e5df;padding:7px 2px;font-size:12px}
 .custom-add{display:flex;gap:7px;margin:8px 0 10px}.custom-add input{flex:1}.custom-add .btn{white-space:nowrap}
 @media(max-width:520px){.statgrid{grid-template-columns:1fr 1fr}.extra-actions .btn{min-width:130px}}
+.community-note{margin-top:12px;background:#f7f6f3;border:1px solid var(--line);border-radius:14px;padding:12px;font-size:11px;color:#666;line-height:1.7}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
@@ -62,11 +64,15 @@ input{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 13
   </div>
   <div class="extra-actions">
     <button class="btn" onclick="saveImage()">🖼️ 画像を保存</button>
-    <button class="btn secondary" onclick="addToStats()">📊 このセトリを集計に追加</button>
-    <button class="btn secondary" onclick="showStats()">📈 集計を見る</button>
+    <button class="btn secondary" onclick="submitToCommunity()">📊 みんなの集計に送信</button>
+    <button class="btn secondary" onclick="showLocalStats()">📈 自分の集計を見る</button>
+  </div>
+  <div class="community-note" id="communityNote">
+    <strong>みんなの投票について</strong><br>
+    「みんなの集計に送信」を押すと、このセトリとコメントがGoogleスプレッドシートへ送信されます。名前・メールアドレスなどは取得しません。
   </div>
   <div class="stats" id="statsBox">
-    <h3>セトリ集計</h3>
+    <h3>自分のセトリ集計</h3>
     <div class="statgrid">
       <div class="statitem"><strong id="statSets">0</strong><span>集計セトリ数</span></div>
       <div class="statitem"><strong id="statSongs">0</strong><span>延べ曲数</span></div>
@@ -146,13 +152,70 @@ function addCustomSong(){
 async function saveImage(){
   const targetEl=document.querySelector('.setlist');
   if(!targetEl)return;
-  if(typeof html2canvas==='undefined'){alert('画像保存の準備ができていません。少し待ってからもう一度お試しください。');return}
+  if(typeof html2canvas==='undefined'){
+    alert('画像保存の準備ができていません。ページを再読み込みしてからもう一度お試しください。');
+    return;
+  }
+  const btn=event?.currentTarget;
+  if(btn)btn.disabled=true;
   try{
-    const canvas=await html2canvas(targetEl,{backgroundColor:'#111',scale:2,useCORS:true});
-    const link=document.createElement('a');
-    link.download=(( $('titleInput').value.trim()||'setlist')+'.png').replace(/[\\/:*?"<>|]/g,'_');
-    link.href=canvas.toDataURL('image/png');link.click();
-  }catch(e){alert('画像の作成に失敗しました。もう一度お試しください。')}
+    const canvas=await html2canvas(targetEl,{
+      backgroundColor:'#111',
+      scale:Math.min(3,window.devicePixelRatio||2),
+      useCORS:true,
+      allowTaint:false,
+      logging:false
+    });
+    const filename=(( $('titleInput').value.trim()||'setlist')+'.png').replace(/[\\/:*?"<>|]/g,'_');
+
+    // iPhone/Safari: show the generated image in a new tab so it can be long-pressed and saved.
+    canvas.toBlob(blob=>{
+      if(!blob){throw new Error('blob failed')}
+      const url=URL.createObjectURL(blob);
+      const w=window.open();
+      if(w){
+        w.document.write('<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(filename)+'</title><style>body{margin:0;background:#222;text-align:center}img{max-width:100%;height:auto}</style><img src="'+url+'" alt="セトリ画像">');
+        w.document.close();
+      }else{
+        const a=document.createElement('a');a.href=url;a.download=filename;a.textContent='画像を保存';
+        document.body.appendChild(a);a.click();a.remove();
+      }
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+    },'image/png');
+  }catch(e){
+    console.error(e);
+    alert('画像の作成に失敗しました。Safariでページを開き直して、もう一度お試しください。');
+  }finally{
+    if(btn)btn.disabled=false;
+  }
+}
+async function submitToCommunity(){
+  // Paste the deployed Google Apps Script Web App URL here.
+  const ENDPOINT='PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+  if(ENDPOINT.includes('PASTE_YOUR')){
+    alert('まだ集計先が設定されていません。Googleスプレッドシートを作成したら、Apps ScriptのURLをここに設定します。');
+    return;
+  }
+  if(!main.length&&!encore.length)return;
+  const payload={
+    title:$('titleInput').value.trim()||'自分だけの理想セトリ',
+    main:[...main],
+    encore:[...encore],
+    comment:$('commentInput').value.trim(),
+    submittedAt:new Date().toISOString()
+  };
+  try{
+    const res=await fetch(ENDPOINT,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify(payload)
+    });
+    alert('みんなの集計に送信しました！ありがとう🫶');
+  }catch(e){
+    console.error(e);
+    alert('送信に失敗しました。通信環境を確認してもう一度お試しください。');
+  }
 }
 function addToStats(){
   if(!main.length&&!encore.length)return;
@@ -160,10 +223,10 @@ function addToStats(){
   statsData.sets++;
   all.forEach(s=>statsData.counts[s]=(statsData.counts[s]||0)+1);
   localStorage.setItem('setlistStats',JSON.stringify(statsData));
-  showStats();
-  alert('このセトリを集計に追加しました！');
+  showLocalStats();
+  alert('このセトリを端末内の集計に追加しました！');
 }
-function showStats(){
+function showLocalStats(){
   $('statsBox').style.display='block';
   const counts=statsData.counts||{}, entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'ja'));
   $('statSets').textContent=statsData.sets||0;
