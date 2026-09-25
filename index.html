@@ -150,7 +150,7 @@ function addCustomSong(){
   selectSong(song);
 }
 async function saveImage(){
-  const targetEl=document.querySelector('.setlist');
+  const targetEl=document.querySelector('#result');
   if(!targetEl)return;
   if(typeof html2canvas==='undefined'){
     alert('画像保存の準備ができていません。ページを再読み込みしてからもう一度お試しください。');
