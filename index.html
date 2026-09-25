@@ -23,7 +23,13 @@ input{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 13
 </style>
 <style>
 .result{display:none}.resulthead{text-align:center;padding:12px 0 20px}.resulthead h2{font-size:25px;margin:6px}.setlist{background:#111;color:#fff;border-radius:20px;padding:20px}.setlist h3{font-size:12px;letter-spacing:.18em;color:#aaa;margin:0 0 10px}.setlist h3 span{float:right}.setrow{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #333}.setrow .num{color:#999;font-size:11px}.setrow .title{font-size:14px}.edit{display:flex;gap:4px}.edit button{border:0;border-radius:7px;padding:5px 7px;font-size:11px;cursor:pointer}.edit button:disabled{opacity:.3}.encore{margin-top:20px;border-top:1px solid #444;padding-top:18px}.add{width:100%;margin-top:12px}.modal{position:fixed;inset:0;background:#0007;display:none;align-items:center;justify-content:center;padding:16px;z-index:20}.modal.open{display:flex}.modalbox{background:#fff;border-radius:18px;padding:18px;width:min(620px,100%);max-height:85vh;display:flex;flex-direction:column}.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.modalbox>input{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin-bottom:10px}.modalbox small{color:#888;margin-top:8px}.songopt{display:block;width:100%;text-align:left;margin:5px 0;padding:10px;border:1px solid #ddd;border-radius:9px;background:#f7f7f8;cursor:pointer}.songopt:disabled{opacity:.4}.empty{color:#999;padding:12px;text-align:center}
-@media(max-width:560px){.setrow{grid-template-columns:28px 1fr}.edit{grid-column:2;justify-content:flex-start}}
+#options{
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+  @media(max-width:560px){.setrow{grid-template-columns:28px 1fr}.edit{grid-column:2;justify-content:flex-start}}
 </style><style>
 .extra-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.extra-actions .btn{flex:1;min-width:150px}
 .comment-box{margin-top:18px}.comment-box textarea{width:100%;min-height:110px;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;font-size:14px;resize:vertical;outline:none}.comment-box textarea:focus{border-color:#888}
