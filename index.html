@@ -159,63 +159,29 @@ async function saveImage(){
   const btn=event?.currentTarget;
   if(btn)btn.disabled=true;
   try{
-        // 画像保存中だけ編集用UIを非表示にする
-    const hiddenForImage = targetEl.querySelectorAll(
-      'button, .edit-controls, .move-controls'
-    );
+const canvas=await html2canvas(targetEl,{
+  backgroundColor:'#111',
+  scale:Math.min(3,window.devicePixelRatio||2),
+  useCORS:true,
+  allowTaint:false,
+  logging:false
+});
+const filename=(( $('titleInput').value.trim()||'setlist')+'.png').replace(/[\\/:*?"<>|]/g,'_');
 
-    const originalDisplay = [];
-
-    hiddenForImage.forEach((el, i) => {
-      originalDisplay[i] = el.style.display;
-      el.style.display = 'none';
-    });
-
-    const canvas = await html2canvas(targetEl, {
-      backgroundColor:'#111',
-      scale:Math.min(3,window.devicePixelRatio||2),
-      useCORS:true,
-      allowTaint:false,
-      logging:false
-    });
-
-    // 画像生成が終わったら元の表示に戻す
-    hiddenForImage.forEach((el, i) => {
-      el.style.display = originalDisplay[i];
-    });
-
-    const filename=(( $('titleInput').value.trim()||'setlist')+'.png')
-      .replace(/[\\/:*?"<>|]/g,'_');
-
-    // iPhone/Safari: show the generated image in a new tab so it can be long-pressed and saved.
-    canvas.toBlob(blob=>{
-      if(!blob){throw new Error('blob failed')}
-
-      const url=URL.createObjectURL(blob);
-      const w=window.open();
-
-      if(w){
-        w.document.write(
-          '<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1">' +
-          '<title>'+esc(filename)+'</title>' +
-          '<style>body{margin:0;background:#222;text-align:center}img{max-width:100%;height:auto}</style>' +
-          '<img src="'+url+'" alt="セトリ画像">'
-        );
-        w.document.close();
-
-      }else{
-        const a=document.createElement('a');
-        a.href=url;
-        a.download=filename;
-        a.textContent='画像を保存';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      }
-
-      setTimeout(()=>URL.revokeObjectURL(url),60000);
-
-    },'image/png');
+// iPhone/Safari: show the generated image in a new tab so it can be long-pressed and saved.
+canvas.toBlob(blob=>{
+  if(!blob){throw new Error('blob failed')}
+  const url=URL.createObjectURL(blob);
+  const w=window.open();
+  if(w){
+    w.document.write('<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(filename)+'</title><style>body{margin:0;background:#222;text-align:center}img{max-width:100%;height:auto}</style><img src="'+url+'" alt="セトリ画像">');
+    w.document.close();
+  }else{
+    const a=document.createElement('a');a.href=url;a.download=filename;a.textContent='画像を保存';
+    document.body.appendChild(a);a.click();a.remove();
+  }
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+},'image/png');
 async function submitToCommunity(){
   // Paste the deployed Google Apps Script Web App URL here.
   const ENDPOINT='https://script.google.com/macros/s/AKfycbxJhkH0nAFfGSwsexBB76HsWje-45aTEl3aiZy3bAmq6mf5D-Vbd7IpZLflDcQkGhoG4Q/exec';
