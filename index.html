@@ -159,7 +159,7 @@ async function saveImage(){
   const btn=event?.currentTarget;
   if(btn)btn.disabled=true;
   try{
-const editControls=targetEl.querySelectorAll('.edit');
+const editControls=targetEl.querySelectorAll('.edit, .add');
 editControls.forEach(el=>el.style.display='none');
 await new Promise(resolve=>requestAnimationFrame(resolve));
     
