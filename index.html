@@ -159,6 +159,8 @@ async function saveImage(){
   const btn=event?.currentTarget;
   if(btn)btn.disabled=true;
   try{
+const editControls=targetEl.querySelectorAll('.edit');
+editControls.forEach(el=>el.style.display='none');
 const canvas=await html2canvas(targetEl,{
 backgroundColor:'#111',
       scale:Math.min(3,window.devicePixelRatio||2),
@@ -182,6 +184,7 @@ backgroundColor:'#111',
       }
       setTimeout(()=>URL.revokeObjectURL(url),60000);
     },'image/png');
+    editControls.forEach(el=>el.style.display='');
   }catch(e){
     console.error(e);
     alert('画像の作成に失敗しました。Safariでページを開き直して、もう一度お試しください。');
