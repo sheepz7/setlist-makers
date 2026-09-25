@@ -161,7 +161,9 @@ async function saveImage(){
   try{
 const editControls=targetEl.querySelectorAll('.edit');
 editControls.forEach(el=>el.style.display='none');
-const canvas=await html2canvas(targetEl,{
+await new Promise(resolve=>requestAnimationFrame(resolve));
+    
+    const canvas=await html2canvas(targetEl,{
 backgroundColor:'#111',
       scale:Math.min(3,window.devicePixelRatio||2),
       useCORS:true,
