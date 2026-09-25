@@ -69,7 +69,7 @@ input{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 13
   </div>
   <div class="community-note" id="communityNote">
     <strong>みんなの投票について</strong><br>
-    「みんなの集計に送信」を押すと、このセトリとコメントがGoogleスプレッドシートへ送信されます。名前・メールアドレスなどは取得しません。
+    「みんなの集計に送信」を押すと、このセトリとコメントが送信されます。名前・メールアドレスなどの個人情報は一切取得しません。詳しくはhttps://docs.github.com/ja/site-policy/content-removal-policies/github-private-information-removal-policy をご確認ください。
   </div>
   <div class="stats" id="statsBox">
     <h3>自分のセトリ集計</h3>
@@ -211,7 +211,7 @@ async function submitToCommunity(){
       headers:{'Content-Type':'text/plain;charset=utf-8'},
       body:JSON.stringify(payload)
     });
-    alert('みんなの集計に送信しました！ありがとう🫶');
+    alert('みんなの集計に送信しました！投票ありがとうございます！🐑');
   }catch(e){
     console.error(e);
     alert('送信に失敗しました。通信環境を確認してもう一度お試しください。');
