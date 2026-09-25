@@ -158,18 +158,35 @@ async function saveImage(){
   }
   const btn=event?.currentTarget;
   if(btn)btn.disabled=true;
-  try{
+ try{
 const editControls=targetEl.querySelectorAll('.edit, .add');
 editControls.forEach(el=>el.style.display='none');
+
+const imageTitle=document.createElement('div');
+imageTitle.innerHTML='<div class="kicker">YOUR SETLIST</div><h2>'+esc($('titleInput').value.trim()||'自分だけの理想セトリ')+'</h2>';
+imageTitle.style.textAlign='center';
+imageTitle.style.color='#fff';
+imageTitle.style.padding='28px 20px 20px';
+imageTitle.style.background='#111';
+imageTitle.style.fontFamily='inherit';
+imageTitle.querySelector('.kicker').style.color='#aaa';
+imageTitle.querySelector('.kicker').style.letterSpacing='.25em';
+imageTitle.querySelector('h2').style.margin='10px 0 0';
+imageTitle.querySelector('h2').style.fontSize='28px';
+
+targetEl.prepend(imageTitle);
+
 await new Promise(resolve=>requestAnimationFrame(resolve));
     
-    const canvas=await html2canvas(targetEl,{
+const canvas=await html2canvas(targetEl,{
 backgroundColor:'#111',
       scale:Math.min(3,window.devicePixelRatio||2),
       useCORS:true,
       allowTaint:false,
       logging:false
     });
+       imageTitle.remove();
+   
     const filename=(( $('titleInput').value.trim()||'setlist')+'.png').replace(/[\\/:*?"<>|]/g,'_');
 
     // iPhone/Safari: show the generated image in a new tab so it can be long-pressed and saved.
